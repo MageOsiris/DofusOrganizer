@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Data;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-using System.Windows.Media.Animation;
+using DofusOrganizer2.Models;
+using DofusOrganizer2.Enums;
 
 namespace DofusOrganizer2
 {
@@ -40,28 +35,14 @@ namespace DofusOrganizer2
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         private const int SW_MAXIMIZE = 3;
-
         private const int HOTKEY_ID = 9000;
-
-        //Modifiers:
-        private const uint MOD_NONE = 0x0000; //(none)
-        private const uint MOD_ALT = 0x0001; //ALT
-        private const uint MOD_CONTROL = 0x0002; //CTRL
-        private const uint MOD_SHIFT = 0x0004; //SHIFT
-        private const uint MOD_WIN = 0x0008; //WINDOWS
-        //CAPS LOCK:
-        private const uint LEFT = 0x25;
-        private const uint UP = 0x26;
-        private const uint RIGHT = 0x27;
-        private const uint X1 = 0x05;
-        private const uint X2 = 0x06;
 
         private IntPtr _windowHandle;
         private HwndSource _source;
 
         private List<DofusElement> dofusElements = new List<DofusElement>();
 
-        private int currentIndex = 0;
+        private int currentIndex = -1;
 
         public MainWindow()
         {
@@ -70,40 +51,107 @@ namespace DofusOrganizer2
 
         private void OnDetectClick(object sender, RoutedEventArgs e)
         {
-            dofusElements = new List<DofusElement>();
-
-            Process[] processCollection = Process.GetProcesses().Where(x => x.ProcessName == "Dofus").ToArray();
+            // Reset layout
 
             Canvas canvas;
             Label label;
             TextBox textBox;
             CheckBox checkBox;
 
-            var cpt = 1;
+            int canvasCpt = 1;
 
-            foreach (Process p in processCollection)
+            for (canvasCpt = 1; canvasCpt <= 8; canvasCpt++)
             {
-                if (cpt != 8)
+                canvas = (Canvas)FindName("Account" + canvasCpt);
+                if (canvas is not null)
                 {
-                    canvas = (Canvas)FindName("Account" + cpt);
-                    if (canvas is not null)
+                    canvas.Visibility = Visibility.Hidden;
+                    label = FindChild<Label>(canvas, "");
+                    if (label is not null)
                     {
-                        label = FindChild<Label>(canvas, "");
-                        textBox = FindChild<TextBox>(canvas, "");
-                        checkBox = FindChild<CheckBox>(canvas, "");
-
-                        if (label is not null
-                            && textBox is not null
-                            && checkBox is not null)
-                        {
-                            label.Content = p.MainWindowTitle.Split(" - ")[0];
-
-                            canvas.Visibility = Visibility.Visible;
-
-                            dofusElements.Add(new DofusElement() { Process = p, Name = p.MainWindowTitle, Rank = 0, Cpt = (cpt + 1).ToString() });
-                        }
+                        label.Content = "Account" + canvasCpt;
                     }
-                    cpt++;
+                    textBox = FindChild<TextBox>(canvas, "");
+                    if (textBox is not null)
+                    {
+                        textBox.Text = "0";
+                    }
+                    checkBox = FindChild<CheckBox>(canvas, "");
+                    if (checkBox is not null)
+                    {
+                        checkBox.IsChecked = true;
+                    }
+                }
+            }
+
+            Label labelInformation = (Label)FindName("Information");
+            Label labelLeft = (Label)FindName("LeftInfo");
+            Label labelRight = (Label)FindName("RightInfo");
+            Button buttonApply = (Button)FindName("Apply");
+
+            if (labelInformation is null
+                || labelLeft is null
+                || labelRight is null
+                || buttonApply is null)
+            {
+                // Todo throw exception
+                return;
+            }
+
+            labelInformation.Visibility = Visibility.Hidden;
+            labelLeft.Visibility = Visibility.Hidden;
+            labelRight.Visibility = Visibility.Hidden;
+            buttonApply.Visibility = Visibility.Hidden;
+
+            dofusElements = new List<DofusElement>();
+
+            Process[] processCollection = Process.GetProcesses().Where(x => x.ProcessName == "Dofus").ToArray();
+
+            if (processCollection is null || processCollection.Length == 0)
+            {
+                labelInformation.Content = "No dofus instances detected";
+                labelInformation.Visibility = Visibility.Visible;
+            }
+            else if (processCollection.Length > 8)
+            {
+                labelInformation.Content = "Too much dofus instances detected. Fuck you xoxo";
+                labelInformation.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                labelInformation.Content = "All of your dofus instance(s)";
+                labelInformation.Visibility = Visibility.Visible;
+
+                labelLeft.Visibility = Visibility.Visible;
+                labelRight.Visibility = Visibility.Visible;
+                buttonApply.Visibility = Visibility.Visible;
+
+                canvasCpt = 1;
+
+                foreach (Process p in processCollection)
+                {
+                    if (canvasCpt != 8)
+                    {
+                        canvas = (Canvas)FindName("Account" + canvasCpt);
+                        if (canvas is not null)
+                        {
+                            label = FindChild<Label>(canvas, "");
+                            textBox = FindChild<TextBox>(canvas, "");
+                            checkBox = FindChild<CheckBox>(canvas, "");
+
+                            if (label is not null
+                                && textBox is not null
+                                && checkBox is not null)
+                            {
+                                label.Content = p.MainWindowTitle.Split(" - ")[0];
+
+                                canvas.Visibility = Visibility.Visible;
+
+                                dofusElements.Add(new DofusElement() { Process = p, Name = p.MainWindowTitle, Rank = 0, Cpt = canvasCpt.ToString() });
+                            }
+                        }
+                        canvasCpt++;
+                    }
                 }
             }
         }
@@ -114,11 +162,11 @@ namespace DofusOrganizer2
             _source = HwndSource.FromHwnd(_windowHandle);
             _source.AddHook(HwndHook);
 
-            RegisterHotKey(_windowHandle, HOTKEY_ID, MOD_NONE, LEFT);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, MOD_NONE, RIGHT);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, MOD_NONE, UP);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, MOD_NONE, X1);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, MOD_NONE, X2);
+            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.LEFT);
+            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.RIGHT);
+            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.UP);
+            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.X1);
+            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.X2);
         }
 
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -131,15 +179,15 @@ namespace DofusOrganizer2
                     {
                         case HOTKEY_ID:
                             int vkey = (((int)lParam >> 16) & 0xFFFF);
-                            if (vkey == LEFT || vkey == X2)
+                            if (vkey == (uint)Keys.LEFT || vkey == (uint)Keys.X2)
                             {
                                 GoNextWindow(true);
                             }
-                            else if (vkey == RIGHT || vkey == X1)
+                            else if (vkey == (uint)Keys.RIGHT || vkey == (uint)Keys.X1)
                             {
                                 GoNextWindow(false);
                             }
-                            else if (vkey == UP)
+                            else if (vkey == (uint)Keys.UP)
                             {
                                 GoCurrentWindow();
                             }
@@ -182,18 +230,9 @@ namespace DofusOrganizer2
             ShowWindow(dofusElements[currentIndex].Process.MainWindowHandle, SW_MAXIMIZE);
         }
 
-        private class DofusElement
-        {
-            public Process Process;
-            public string Name;
-            public int Rank;
-            public string Cpt;
-            public bool Enable;
-        }
-
         protected override void OnClosed(EventArgs e)
         {
-            //_source.RemoveHook(HwndHook);
+            _source?.RemoveHook(HwndHook);
             UnregisterHotKey(_windowHandle, HOTKEY_ID);
             base.OnClosed(e);
         }

@@ -8,10 +8,10 @@
         Title="MainWindow" Height="510" Width="365" ResizeMode="NoResize">
     <Grid>
         <Canvas>
-            <Button Content="Detection all of dofus instances" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.112,0.235" Width="330" Click="OnDetectClick" Grid.ColumnSpan="2"/>
+            <Button Name="Detect" Content="Detection all of dofus instances" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.112,0.235" Width="330" Click="OnDetectClick" Grid.ColumnSpan="2"/>
         </Canvas>
         <Canvas Height="NaN" Margin="0,33,0,0">
-            <Label Content="All of your dofus instance(s)" Canvas.Left="10" Canvas.Top="10" HorizontalAlignment="Center" VerticalAlignment="Top" Width="330" HorizontalContentAlignment="Center"/>
+            <Label Name="Information" Content="All of your dofus instance(s)" Canvas.Left="10" Canvas.Top="10" HorizontalAlignment="Center" VerticalAlignment="Top" Width="330" HorizontalContentAlignment="Center" Visibility="Hidden"/>
             <Canvas Name="Account1" Height="40" Width="330" Canvas.Left="10" Canvas.Top="40" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#FFDFDFDF" Visibility="Hidden">
                 <Label Content="Label" Canvas.Left="10" Canvas.Top="7"/>
                 <CheckBox Content="" Canvas.Left="300" Canvas.Top="12" RenderTransformOrigin="1.384,0.144" HorizontalAlignment="Left" VerticalAlignment="Center"/>
@@ -52,9 +52,9 @@
                 <CheckBox Content="" Canvas.Left="300" Canvas.Top="12" RenderTransformOrigin="1.384,0.144" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <TextBox Canvas.Left="227" TextWrapping="Wrap" Canvas.Top="11" Width="68" HorizontalAlignment="Left" VerticalAlignment="Center" Text="0"/>
             </Canvas>
-            <Label Content="X2 or Left" Canvas.Left="10" Canvas.Top="410" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <Label Content="X1 or Right" Canvas.Right="10" Canvas.Top="410" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right"/>
-            <Button Content="Apply" Canvas.Left="100" Canvas.Top="413" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Click="OnApply"/>
+            <Label Name="LeftInfo" Content="X2 or Left" Canvas.Left="10" Canvas.Top="410" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden"/>
+            <Label Name="RightInfo" Content="X1 or Right" Canvas.Right="10" Canvas.Top="410" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right" Visibility="Hidden"/>
+            <Button Name="Apply" Content="Apply" Canvas.Left="100" Canvas.Top="413" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Click="OnApply" Visibility="Hidden"/>
         </Canvas>
     </Grid>
 </Window>
