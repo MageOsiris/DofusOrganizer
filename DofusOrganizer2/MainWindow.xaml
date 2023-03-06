@@ -55,6 +55,8 @@
             <Label Name="LeftInfo" Content="X2 or Left" Canvas.Left="10" Canvas.Top="410" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden"/>
             <Label Name="RightInfo" Content="X1 or Right" Canvas.Right="10" Canvas.Top="410" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right" Visibility="Hidden"/>
             <Button Name="Apply" Content="Apply" Canvas.Left="100" Canvas.Top="413" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Click="OnApply" Visibility="Hidden"/>
+            <Slider Canvas.Left="10" Canvas.Top="400" Width="31" Maximum="1" SmallChange="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Slider Canvas.Right="10" Canvas.Top="400" Width="31" Maximum="1" SmallChange="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         </Canvas>
     </Grid>
 </Window>

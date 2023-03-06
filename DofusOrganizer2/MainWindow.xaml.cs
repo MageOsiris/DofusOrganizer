@@ -162,11 +162,36 @@ namespace DofusOrganizer2
             _source = HwndSource.FromHwnd(_windowHandle);
             _source.AddHook(HwndHook);
 
+            Canvas canvas;
+            Label label;
+            TextBox textBox;
+            CheckBox checkBox;
+
+            foreach (DofusElement dofusElement in dofusElements)
+            {
+                canvas = (Canvas)FindName("Account" + dofusElement.Cpt);
+                if (canvas is not null && canvas.Visibility == Visibility.Visible)
+                {
+                    textBox = FindChild<TextBox>(canvas, "");
+                    checkBox = FindChild<CheckBox>(canvas, "");
+
+                    if (textBox is not null
+                        && checkBox is not null)
+                    {
+                        dofusElement.Enable = checkBox.IsChecked ?? false;
+                        dofusElement.Rank = int.TryParse(textBox.Text, out int value) ? value : 0;
+                    }
+                }
+            }
+
+            dofusElements = dofusElements.OrderBy(x => x.Rank).ThenBy(x => x.Name).ToList();
+
             RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.LEFT);
             RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.RIGHT);
             RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.UP);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.X1);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.X2);
+            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F10);
+            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F11);
+            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F12);
         }
 
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -179,15 +204,15 @@ namespace DofusOrganizer2
                     {
                         case HOTKEY_ID:
                             int vkey = (((int)lParam >> 16) & 0xFFFF);
-                            if (vkey == (uint)Keys.LEFT || vkey == (uint)Keys.X2)
+                            if (vkey == (uint)Keys.LEFT || vkey == (uint)Keys.F11)
                             {
                                 GoNextWindow(true);
                             }
-                            else if (vkey == (uint)Keys.RIGHT || vkey == (uint)Keys.X1)
+                            else if (vkey == (uint)Keys.RIGHT || vkey == (uint)Keys.F12)
                             {
                                 GoNextWindow(false);
                             }
-                            else if (vkey == (uint)Keys.UP)
+                            else if (vkey == (uint)Keys.UP || vkey == (uint)Keys.F10)
                             {
                                 GoCurrentWindow();
                             }
@@ -226,6 +251,8 @@ namespace DofusOrganizer2
 
         private void GoCurrentWindow()
         {
+            if (currentIndex == -1)
+                currentIndex = 0;
             SetForegroundWindow(dofusElements[currentIndex].Process.MainWindowHandle);
             ShowWindow(dofusElements[currentIndex].Process.MainWindowHandle, SW_MAXIMIZE);
         }
@@ -288,6 +315,16 @@ namespace DofusOrganizer2
             }
 
             return foundChild;
+        }
+
+        private void SliderLeft_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+        }
+
+        private void SliderRight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
         }
     }
 }
