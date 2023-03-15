@@ -41,12 +41,32 @@ namespace DofusOrganizer2
         private HwndSource _source;
 
         private List<DofusElement> dofusElements = new List<DofusElement>();
+        private List<DofusElement> filterDofusElements = new List<DofusElement>();
 
         private int currentIndex = -1;
 
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private SliderValue LeftValue = SliderValue.ArrowKeys;
+        private SliderValue RightValue = SliderValue.ArrowKeys;
+        private SliderValue CenterValue = SliderValue.Nothing;
+
+        private enum SliderValue
+        {
+            ArrowKeys = 0,
+            Both = 1,
+            FKeys = 2,
+            Nothing = 3
+        }
+
+        private enum SliderType
+        {
+            Left = 0,
+            Middle = 1,
+            Right = 2
         }
 
         private void OnDetectClick(object sender, RoutedEventArgs e)
@@ -65,7 +85,7 @@ namespace DofusOrganizer2
                 canvas = (Canvas)FindName("Account" + canvasCpt);
                 if (canvas is not null)
                 {
-                    canvas.Visibility = Visibility.Hidden;
+                    canvas.Visibility = Visibility.Visible;
                     label = FindChild<Label>(canvas, "");
                     if (label is not null)
                     {
@@ -85,13 +105,23 @@ namespace DofusOrganizer2
             }
 
             Label labelInformation = (Label)FindName("Information");
+
+            Label labelLeftBase = (Label)FindName("LeftInfoBase");
+            Label labelRightBase = (Label)FindName("RightInfoBase");
+            Label labelMiddleBase = (Label)FindName("CenterInfoBase");
+
             Label labelLeft = (Label)FindName("LeftInfo");
             Label labelRight = (Label)FindName("RightInfo");
+            Label labelMiddle = (Label)FindName("CenterInfo");
+            Slider sliderLeft = (Slider)FindName("LeftSlider");
+            Slider sliderRight = (Slider)FindName("RightSlider");
+            Slider sliderMiddle = (Slider)FindName("CenterSlider");
             Button buttonApply = (Button)FindName("Apply");
 
             if (labelInformation is null
                 || labelLeft is null
                 || labelRight is null
+                || labelMiddle is null
                 || buttonApply is null)
             {
                 // Todo throw exception
@@ -101,6 +131,15 @@ namespace DofusOrganizer2
             labelInformation.Visibility = Visibility.Hidden;
             labelLeft.Visibility = Visibility.Hidden;
             labelRight.Visibility = Visibility.Hidden;
+            labelMiddle.Visibility = Visibility.Hidden;
+
+            labelLeftBase.Visibility = Visibility.Hidden;
+            labelRightBase.Visibility = Visibility.Hidden;
+            labelMiddleBase.Visibility = Visibility.Hidden;
+
+            sliderLeft.Visibility = Visibility.Hidden;
+            sliderRight.Visibility = Visibility.Hidden;
+            sliderMiddle.Visibility = Visibility.Hidden;
             buttonApply.Visibility = Visibility.Hidden;
 
             dofusElements = new List<DofusElement>();
@@ -122,9 +161,27 @@ namespace DofusOrganizer2
                 labelInformation.Content = "All of your dofus instance(s)";
                 labelInformation.Visibility = Visibility.Visible;
 
+                GetSliderValueData data = GetSliderValue(LeftValue, SliderType.Left);
+                labelLeft.Content = data.SliderLabel;
+                data = GetSliderValue(CenterValue, SliderType.Middle);
+                labelMiddle.Content = data.SliderLabel;
+                data = GetSliderValue(RightValue, SliderType.Right);
+                labelRight.Content = data.SliderLabel;
+
                 labelLeft.Visibility = Visibility.Visible;
                 labelRight.Visibility = Visibility.Visible;
+                labelMiddle.Visibility = Visibility.Visible;
+
+                labelLeftBase.Visibility = Visibility.Visible;
+                labelRightBase.Visibility = Visibility.Visible;
+                labelMiddleBase.Visibility = Visibility.Visible;
+
                 buttonApply.Visibility = Visibility.Visible;
+
+                sliderLeft.Visibility = Visibility.Visible;
+                sliderRight.Visibility = Visibility.Visible;
+                sliderMiddle.Visibility = Visibility.Visible;
+
 
                 canvasCpt = 1;
 
@@ -184,14 +241,22 @@ namespace DofusOrganizer2
                 }
             }
 
-            dofusElements = dofusElements.OrderBy(x => x.Rank).ThenBy(x => x.Name).ToList();
+            filterDofusElements = dofusElements.Where(x => x.Enable).OrderBy(x => x.Rank).ThenBy(x => x.Name).ToList();
 
-            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.LEFT);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.RIGHT);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.UP);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F10);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F11);
-            RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F12);
+            UnregisterHotKey(_windowHandle, HOTKEY_ID);
+
+            if (LeftValue == SliderValue.ArrowKeys || LeftValue == SliderValue.Both)
+                RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.LEFT);
+            if (RightValue == SliderValue.ArrowKeys || RightValue == SliderValue.Both)
+                RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.RIGHT);
+            if (CenterValue == SliderValue.ArrowKeys || CenterValue == SliderValue.Both)
+                RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.NONE, (uint)Keys.UP);
+            if (CenterValue == SliderValue.FKeys || LeftValue == SliderValue.Both)
+                RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F10);
+            if (LeftValue == SliderValue.FKeys || LeftValue == SliderValue.Both)
+                RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F11);
+            if (RightValue == SliderValue.FKeys || LeftValue == SliderValue.Both)
+                RegisterHotKey(_windowHandle, HOTKEY_ID, (uint)ModifiersKeys.CONTROL, (uint)Keys.F12);
         }
 
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -229,10 +294,10 @@ namespace DofusOrganizer2
             if (currentIndex > -1)
             {
                 if (isAscend && currentIndex == 0)
-                    currentIndex = dofusElements.Count - 1;
+                    currentIndex = filterDofusElements.Count - 1;
                 else if (isAscend)
                     currentIndex--;
-                else if (!isAscend && currentIndex == (dofusElements.Count - 1))
+                else if (!isAscend && currentIndex == (filterDofusElements.Count - 1))
                     currentIndex = 0;
                 else
                     currentIndex++;
@@ -244,8 +309,8 @@ namespace DofusOrganizer2
 
             if (currentIndex > -1)
             {
-                SetForegroundWindow(dofusElements[currentIndex].Process.MainWindowHandle);
-                ShowWindow(dofusElements[currentIndex].Process.MainWindowHandle, SW_MAXIMIZE);
+                SetForegroundWindow(filterDofusElements[currentIndex].Process.MainWindowHandle);
+                ShowWindow(filterDofusElements[currentIndex].Process.MainWindowHandle, SW_MAXIMIZE);
             }
         }
 
@@ -253,8 +318,8 @@ namespace DofusOrganizer2
         {
             if (currentIndex == -1)
                 currentIndex = 0;
-            SetForegroundWindow(dofusElements[currentIndex].Process.MainWindowHandle);
-            ShowWindow(dofusElements[currentIndex].Process.MainWindowHandle, SW_MAXIMIZE);
+            SetForegroundWindow(filterDofusElements[currentIndex].Process.MainWindowHandle);
+            ShowWindow(filterDofusElements[currentIndex].Process.MainWindowHandle, SW_MAXIMIZE);
         }
 
         protected override void OnClosed(EventArgs e)
@@ -319,11 +384,53 @@ namespace DofusOrganizer2
 
         private void SliderLeft_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+            Label label = (Label)FindName("LeftInfo");
+            GetSliderValueData data = GetSliderValue((int)e.NewValue, SliderType.Left);
+            LeftValue = data.Value;
+            label.Content = data.SliderLabel;
         }
 
         private void SliderRight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            Label label = (Label)FindName("RightInfo");
+            GetSliderValueData data = GetSliderValue((int)e.NewValue, SliderType.Right);
+            RightValue = data.Value;
+            label.Content = data.SliderLabel;
+        }
+
+        private void SliderCenter_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Label label = (Label)FindName("CenterInfo");
+            GetSliderValueData data = GetSliderValue((int)e.NewValue, SliderType.Middle);
+            CenterValue = data.Value;
+            label.Content = data.SliderLabel;
+        }
+
+        private GetSliderValueData GetSliderValue(int value, SliderType type)
+        {
+            switch (value)
+            {
+                case (int)SliderValue.Nothing:
+                    return new GetSliderValueData() { Value = SliderValue.FKeys, SliderLabel = "Unset" };
+                case (int)SliderValue.FKeys:
+                    return new GetSliderValueData() { Value = SliderValue.FKeys, SliderLabel = (type == SliderType.Left ? "F11 key" : (type == SliderType.Right ? "F12 key" : "F10 key")) };
+                case (int)SliderValue.Both:
+                    return new GetSliderValueData() { Value = SliderValue.Both, SliderLabel = (type == SliderType.Left ? "F11 or < key" : (type == SliderType.Right ? "F12 or > key" : "F10 or ^ key")) };
+                case (int)SliderValue.ArrowKeys:
+                default:
+                    return new GetSliderValueData() { Value = SliderValue.ArrowKeys, SliderLabel = (type == SliderType.Left ? "< key" : (type == SliderType.Right ? "> key" : "^ key")) };
+            }
+        }
+
+        private GetSliderValueData GetSliderValue(SliderValue value, SliderType type)
+        {
+            return GetSliderValue((int)value, type);
+        }
+
+        private class GetSliderValueData 
+        {
+            public SliderValue Value { get; set; }
+            public string SliderLabel { get; set; }
 
         }
     }
