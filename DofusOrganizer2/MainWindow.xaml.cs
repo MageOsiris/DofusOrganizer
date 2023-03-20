@@ -45,14 +45,15 @@ namespace DofusOrganizer2
 
         private int currentIndex = -1;
 
+        private SliderValue LeftValue = SliderValue.Both;
+        private SliderValue RightValue = SliderValue.Both;
+        private SliderValue CenterValue = SliderValue.Both;
+
+
         public MainWindow()
         {
             InitializeComponent();
         }
-
-        private SliderValue LeftValue = SliderValue.ArrowKeys;
-        private SliderValue RightValue = SliderValue.ArrowKeys;
-        private SliderValue CenterValue = SliderValue.Nothing;
 
         private enum SliderValue
         {
@@ -144,7 +145,7 @@ namespace DofusOrganizer2
 
             dofusElements = new List<DofusElement>();
 
-            Process[] processCollection = Process.GetProcesses().Where(x => x.ProcessName == "Dofus").ToArray();
+            Process[] processCollection = Process.GetProcesses().Where(x => x.ProcessName == "Dofus" && !string.IsNullOrEmpty(x.MainWindowTitle)).ToArray();
 
             if (processCollection is null || processCollection.Length == 0)
             {
@@ -178,10 +179,13 @@ namespace DofusOrganizer2
 
                 buttonApply.Visibility = Visibility.Visible;
 
+                sliderLeft.Value = (int)LeftValue;
+                sliderRight.Value = (int)RightValue;
+                sliderMiddle.Value = (int)CenterValue;
+
                 sliderLeft.Visibility = Visibility.Visible;
                 sliderRight.Visibility = Visibility.Visible;
                 sliderMiddle.Visibility = Visibility.Visible;
-
 
                 canvasCpt = 1;
 
@@ -413,9 +417,9 @@ namespace DofusOrganizer2
                 case (int)SliderValue.Nothing:
                     return new GetSliderValueData() { Value = SliderValue.FKeys, SliderLabel = "Unset" };
                 case (int)SliderValue.FKeys:
-                    return new GetSliderValueData() { Value = SliderValue.FKeys, SliderLabel = (type == SliderType.Left ? "F11 key" : (type == SliderType.Right ? "F12 key" : "F10 key")) };
+                    return new GetSliderValueData() { Value = SliderValue.FKeys, SliderLabel = (type == SliderType.Left ? "CTRL+F11 keys" : (type == SliderType.Right ? "CTRL+F12 keys" : "CTRL+F10 keys")) };
                 case (int)SliderValue.Both:
-                    return new GetSliderValueData() { Value = SliderValue.Both, SliderLabel = (type == SliderType.Left ? "F11 or < key" : (type == SliderType.Right ? "F12 or > key" : "F10 or ^ key")) };
+                    return new GetSliderValueData() { Value = SliderValue.Both, SliderLabel = (type == SliderType.Left ? "CTRL+F11 or < key(s)" : (type == SliderType.Right ? "CTRL+F12 or > key(s)" : "CTRL+F10 or ^ key(s)")) };
                 case (int)SliderValue.ArrowKeys:
                 default:
                     return new GetSliderValueData() { Value = SliderValue.ArrowKeys, SliderLabel = (type == SliderType.Left ? "< key" : (type == SliderType.Right ? "> key" : "^ key")) };

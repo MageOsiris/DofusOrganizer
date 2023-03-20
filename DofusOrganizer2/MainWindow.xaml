@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DofusOrganizer2"
         mc:Ignorable="d"
-        Title="DofusOrganizer" Height="550" Width="365" ResizeMode="CanMinimize">
+        Title="DofusOrganizer" Height="680" Width="365" ResizeMode="CanMinimize">
     <Grid>
         <Canvas>
-            <Button Name="Detect" Content="Detection all of dofus instances" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.112,0.235" Width="330" Click="OnDetectClick" Grid.ColumnSpan="2"/>
+            <Button Name="Detect" Content="Detection all of dofus instances" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.112,0.235" Width="330" Click="OnDetectClick" Grid.ColumnSpan="2" FontWeight="Bold"/>
         </Canvas>
         <Canvas Height="NaN" Margin="0,33,0,0">
-            <Label Name="Information" Content="All of your dofus instance(s)" Canvas.Left="10" Canvas.Top="10" HorizontalAlignment="Center" VerticalAlignment="Top" Width="330" HorizontalContentAlignment="Center" Visibility="Hidden"/>
+            <Label Name="Information" Content="All of your dofus instance(s)" Canvas.Left="10" Canvas.Top="10" HorizontalAlignment="Center" VerticalAlignment="Top" Width="330" HorizontalContentAlignment="Center" Visibility="Hidden" FontWeight="Bold"/>
             <Canvas Name="Account1" Height="40" Width="330" Canvas.Left="10" Canvas.Top="40" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#FFDFDFDF" Visibility="Hidden">
                 <Label Content="Label" Canvas.Left="10" Canvas.Top="7"/>
                 <CheckBox Content="" Canvas.Left="300" Canvas.Top="12" RenderTransformOrigin="1.384,0.144" HorizontalAlignment="Left" VerticalAlignment="Center"/>
@@ -53,19 +53,19 @@
                 <TextBox Canvas.Left="227" TextWrapping="Wrap" Canvas.Top="11" Width="68" HorizontalAlignment="Left" VerticalAlignment="Center" Text="0"/>
             </Canvas>
 
-            <Label Name="LeftInfoBase" Content="Previous dofus" Canvas.Left="10" Canvas.Bottom="63" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden"/>
-            <Label Name="RightInfoBase" Content="Next dofus" Canvas.Right="10" Canvas.Bottom="63" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right" Visibility="Hidden"/>
-            <Label Name="CenterInfoBase" Content="Current dofus" Canvas.Left="140" Canvas.Bottom="63" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Center" Visibility="Hidden"/>
+            <Label Name="LeftInfoBase" Content="Previous dofus hotkey(s)" Canvas.Left="10" Canvas.Bottom="163" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Visibility="Hidden"/>
+            <Label Name="CenterInfoBase" Content="Current dofus hotkey(s)" Canvas.Left="10" Canvas.Bottom="113" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Center" FontWeight="Bold" Visibility="Hidden"/>
+            <Label Name="RightInfoBase" Content="Next dofus hotkey(s)" Canvas.Left="10" Canvas.Bottom="63" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right" FontWeight="Bold" Visibility="Hidden"/>
+            
+            <Slider Name="LeftSlider" Canvas.Left="10" Canvas.Bottom="150" Width="330" Maximum="2" SmallChange="1" HorizontalAlignment="Left" VerticalAlignment="Center" ValueChanged="SliderLeft_ValueChanged" Visibility="Hidden"/>
+            <Slider Name="CenterSlider" Canvas.Left="10" Canvas.Bottom="100" Width="330" Maximum="3" SmallChange="1" HorizontalAlignment="Left" VerticalAlignment="Center" ValueChanged="SliderCenter_ValueChanged" Visibility="Hidden"/>
+            <Slider Name="RightSlider" Canvas.Left="10" Canvas.Bottom="50" Width="330" Maximum="2" SmallChange="1" HorizontalAlignment="Left" VerticalAlignment="Center" ValueChanged="SliderRight_ValueChanged" Visibility="Hidden"/>
 
-            <Slider Name="LeftSlider" Canvas.Left="10" Canvas.Bottom="50" Width="80" Maximum="2" SmallChange="1" HorizontalAlignment="Left" VerticalAlignment="Center" ValueChanged="SliderLeft_ValueChanged" Visibility="Hidden"/>
-            <Slider Name="RightSlider" Canvas.Left="141" Canvas.Bottom="50" Width="80" Maximum="3" SmallChange="1" HorizontalAlignment="Left" VerticalAlignment="Center" ValueChanged="SliderCenter_ValueChanged" Visibility="Hidden"/>
-            <Slider Name="CenterSlider" Canvas.Right="10" Canvas.Bottom="50" Width="80" Maximum="2" SmallChange="1" HorizontalAlignment="Left" VerticalAlignment="Center" ValueChanged="SliderRight_ValueChanged" Visibility="Hidden"/>
+            <Label Name="LeftInfo" Content="" Canvas.Right="10" Canvas.Bottom="163" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right" Visibility="Hidden"/>
+            <Label Name="CenterInfo" Content="" Canvas.Right="10" Canvas.Bottom="113" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right" Visibility="Hidden"/>
+            <Label Name="RightInfo" Content="" Canvas.Right="10" Canvas.Bottom="63" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right" Visibility="Hidden"/>
 
-            <Label Name="LeftInfo" Content="" Canvas.Left="10" Canvas.Bottom="30" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Hidden"/>
-            <Label Name="RightInfo" Content="" Canvas.Right="10" Canvas.Bottom="30" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Right" Visibility="Hidden"/>
-            <Label Name="CenterInfo" Content="" Canvas.Left="150" Canvas.Bottom="30" HorizontalAlignment="Right" VerticalAlignment="Center" HorizontalContentAlignment="Center" Visibility="Hidden"/>
-
-            <Button Name="Apply" Content="Apply" Canvas.Left="100" Canvas.Bottom="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Click="OnApply" Visibility="Hidden"/>
+            <Button Name="Apply" Content="Apply" Canvas.Left="100" Canvas.Bottom="10" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Click="OnApply" Visibility="Hidden" FontWeight="Bold"/>
 
         </Canvas>
     </Grid>
