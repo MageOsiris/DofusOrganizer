@@ -86,7 +86,7 @@ namespace DofusOrganizer2
                 canvas = (Canvas)FindName("Account" + canvasCpt);
                 if (canvas is not null)
                 {
-                    canvas.Visibility = Visibility.Visible;
+                    canvas.Visibility = Visibility.Hidden;
                     label = FindChild<Label>(canvas, "");
                     if (label is not null)
                     {
